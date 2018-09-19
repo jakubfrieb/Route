@@ -1,9 +1,11 @@
-# Ghost Route
-An Fully Automatic, Framework independent, RESTful PHP Router.
+# Router
+[![Build Status](https://travis-ci.org/Scrawler-php/Router.svg?branch=master)](https://travis-ci.org/Scrawler-php/Router)
 
-Why Ghost Route?
+An Fully Automatic, Framework independent, RESTful PHP Router component used in scrawler.
+
+Why Scrawler Router?
 ------------------
-Ghost Route is an library for automatic restful routing, you do not have to define a single route, it automatically detects the url and calls the corrosponding controler.
+This is an library for automatic restful routing, you do not have to define a single route, it automatically detects the url and calls the corresponding controller.
 Automatic routing is made possible by following some conventions.
 
 Installation
@@ -11,35 +13,9 @@ Installation
 
 ### Using Composer
 
-Install composer in your project:
 
 ```sh
-$ curl -s https://getcomposer.org/installer | php
-```
-**Caution**: The above command requires you to place a lot of trust in the composer team to not get hacked and have a backdoor installed in their installer script. If secuity is a concern, consider doing the following:
-
-```sh
-$ curl -s https://getcomposer.org/installer > installer.php
-$ less installer.php
-$ # When you're certain it's safe...
-$ php installer.php
-```
-
-
-Create a `composer.json` file in your project root:
-
-```js
-{
-    "require": {
-        "ghost/route": "dev-master"
-    }
-}
-```
-
-Install via composer:
-
-```sh
-$ php composer.phar install
+composer require scrawler/router
 ```
 
 
@@ -49,20 +25,30 @@ In your index.php
 ```php
 <?php
 
-use Ghost\Route\RouteCollection;
-use Ghost\Route\Router;
+use Scrawler\Router\RouteCollection;
+use Scrawler\Router\Router;
+use Symfony\Component\HttpFoundation\Response;
 
 
 $dir = /path/to/your/controllers;
 $namespace = Namespace\of\your\controllers;
 
-$collection = new RouteCollection($dir,$namespace);
-$router = new Router($collection);
-//Dispatch route using controller and method found
-$router->dispatch()
+$router = new Router(new RouteCollection($dir,$namespace));
+//Optional you can now pass your own Request object to Router for Router to work on
+//$router = new Router(new RouteCollection($dir,$namespace),Request $request);
+
+
+//Dispatch route and get back the response
+$response = $router->dispatch();
+
+//Do anything with your Response object here
+//Probably middleware can hook in here
+
+//send response
+$response->send();
 ```
 
-Done now whatever request occurs it will be automatically routed . You dont have define a single route
+Done now whatever request occurs it will be automatically routed . You don't have define a single route
 
 How it Works?
 ----------------
@@ -75,7 +61,7 @@ The automatic routing is possible by following some conventions. Lets take a exa
 class Hello{
 
 public function getWorld(){
-echo "Hello World";
+return "Hello World";
 }
 
 }
@@ -96,7 +82,7 @@ The controller and function that would be invoked will be
 class controller{
 
 public function methodFunction(arguments1,arguments2){
-//Defination goes here 
+//Definition goes here
 }
 
 }
@@ -113,11 +99,11 @@ would invoke following controller and method
 class User{
 
 public function getFind($id){
-//Function defination goes here
+//Function definition goes here
 }
 }
 ```
-In above example `1` will be passed as argument `$id` 
+In above example `1` will be passed as argument `$id`
 
 How should I name my function for automatic routing?
 ----------------------------------------------------
@@ -125,7 +111,7 @@ How should I name my function for automatic routing?
 The function name in the controller should be named according to following convention:
 `methodFunctionname`
 Note:The method should always be written in small and the first word of function name should always start with capital.
-Method is the method used while calling url. Valid methods are: 
+Method is the method used while calling url. Valid methods are:
 
 ```
 all - maps any kind of request method i.e it can be get,post etc
@@ -139,40 +125,9 @@ Some eg. of valid function names are:
 Invalid function names are:
 `GETarticles, Postuser, PutResource`
 
-It is not working in subdirectory:
-----------------------------------
-It is one of the known bug and writing following code before calling the router will fix it.
-NOTE: THIS CODE MUST STRICTLY BE IN YOUR INDEX.PHP IN ORDER TO WORK
-
-```php
-<?php
-
-use Ghost\Route\RouteCollection;
-use Ghost\Route\Router;
-
-//Detect if installation is on a subdirectory
-$root = $_SERVER['DOCUMENT_ROOT'];
-$path = dirname(__FILE__);
-if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-    define('SEPARATOR', '\\');
-} else {
-    define('SEPARATOR', '/');
-}
-if ($root != $path) {
-    $root = explode('/', $root);
-    $path = explode(SEPARATOR, $path);
-    $subdir = array_diff($path, $root);
-    $subdir = implode('/', $subdir);
-    define('SUBDIR', $subdir);
-}
-
-// Intialize Router
-$dir = /path/to/your/controllers;
-$namespace = Namespace\of\your\controllers;
-
-$collection = new RouteCollection($dir,$namespace);
-$router = new Router($collection);
-```
+Need more information on working?
+----------------------------------------------------
+Test folders are probably the best place where you can see internal working of various functions and use them in your project accordinglt
 
 Server Configuration
 ----------------------
@@ -227,7 +182,5 @@ location / {
 
 License
 -------
-Ghost Route is created by [Pranjal Pandey](https://www.physcocode.com) and released under
+Scrawler Router is created by [Pranjal Pandey](https://www.physcocode.com) and released under
 the MIT License.
-
-

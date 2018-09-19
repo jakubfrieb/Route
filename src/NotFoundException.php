@@ -2,10 +2,10 @@
 
 /**
  * An Exception to be thrown on 404 error
- * 
+ *
  * @author : Pranjal Pandey
  */
-namespace Ghost\Route;
+namespace Scrawler\Router;
 
 use Throwable;
 
